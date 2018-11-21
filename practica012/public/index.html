@@ -1,14 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Chat</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <script src="main.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <h2></h2>
+    <h1>chat</h1>
+    <input type="text" id="userName" placeholder="Ingresa un nombre">
+    <input type="submit" id="setUserName" value="Aceptar">
+    <br><label for="userColor">Selecciona un color</label>
+    <br>
+    <input type="color" id="userColor">
+    <br>
+    <br>
+    <div id="chatContent"></div>
+    <input type="text" id="mensaje">
+    <input type="button" value="Enviar" id="btnEnviar">
+
+    
 </body>
+
+<script>
+var socket = io();
+socket.on('connect',()=>{
+    //console.log('Conectado');
+    socket.emit('usuarioNuevo', ()=>{
+        usuario: "Juan"
+    });
+});
+
+socket.on('disconnect', ()=>{
+    console.log('Se perdió la conexión');
+});
+
+socket.on('mensajeNuevo',(data)=>{
+    showMensaje(data.usuario, data.mensaje);
+})
+
+document.getElementById("btnEnviar").addEventListener("click",()=>{
+    var mensaje = document.getElementById("mensaje").value;
+    var color = document.getElementById("userColor").value;
+    var nombre = document.getElementById("userName").value;
+    
+    socket.emit('mensajeNuevo', {
+        usuario: nombre,
+        mensaje
+    },(res)=>{
+        showMensaje("Tú", res.mensaje);
+    });
+
+
+})
+function showMensaje(usuario, mensaje){
+    document.getElementById("chatContent").innerHTML += `${usuario}: ${mensaje} <br> `;
+    document.getElementById("chatContent").style.color = color;
+}
+
+</script>
 </html>
